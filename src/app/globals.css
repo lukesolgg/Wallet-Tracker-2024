@@ -22,33 +22,18 @@ body {
 
 /* animating the refresh logo in the navbar */
 
-@keyframes outline-circle {
+@keyframes circleFill {
   0% {
-    stroke-dasharray: 0 283;
+    stroke-dasharray: 283;
     stroke-dashoffset: 283;
   }
   100% {
-    stroke-dasharray: 56.6 226.4;
+    stroke-dasharray: 283;
     stroke-dashoffset: 0;
   }
 }
 
-@keyframes rotate-circle {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .animate-outline-circle {
-  animation: outline-circle 30s linear infinite;
-  stroke-dasharray: 56.6 226.4;
-  stroke-dashoffset: 0;
-  transform-origin: center;
-}
-
-.animate-rotate-circle {
-  animation: rotate-circle 30s linear infinite;
+  animation: circleFill 30s linear infinite;
+  stroke: #9333EA;
 }
