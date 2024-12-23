@@ -37,7 +37,7 @@ function Footer() {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-gray-300">Made with Love - Dec. 2024</p>
+        <p className="mt-8 text-center text-gray-300">Chewing Glass in - Dec. 2024</p>
       </div>
     </div>
   )

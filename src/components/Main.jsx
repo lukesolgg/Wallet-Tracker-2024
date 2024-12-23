@@ -141,7 +141,6 @@ function Main() {
   return (
     <div className="flex-grow flex items-center justify-center pt-16 pb-16">
       <div className="bg-gray-950 p-8 flex flex-col items-center justify-center max-w-screen-xl w-full h-full text-center">
-        <Header />
         {!isSubmitted ? (
           <>
             <h1 className="text-3xl font-bold text-purple-600 mt-4">Wallet Tracker</h1>

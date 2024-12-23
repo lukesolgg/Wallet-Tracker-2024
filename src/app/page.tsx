@@ -2,6 +2,7 @@ import React from "react";
 import Main from "../components/Main.jsx";
 import Footer from "../components/Footer.jsx";
 import Navbar from "../components/Navbar.jsx";
+import Coins from "../components/Coins.jsx";  
 
 export default function Home() {
   return (
@@ -9,6 +10,8 @@ export default function Home() {
       <Navbar />
 
       <Main />
+
+      <Coins />
 
       <Footer />
     </div>
