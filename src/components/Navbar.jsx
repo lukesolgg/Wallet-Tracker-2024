@@ -1,4 +1,8 @@
 import React from 'react'
+import { IconButton } from '@mui/material'
+import SettingsIcon from '@mui/icons-material/Settings'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import DescriptionIcon from '@mui/icons-material/Description'
 
 function Navbar() {
   return (
@@ -8,12 +12,32 @@ function Navbar() {
           <h1 className="text-xl font-bold text-purple-600 cursor-pointer">LK SOL</h1>
         </div>
 
-        <nav>
-          <ul className="flex space-x-4">
-            <li className="hover:text-gray-300 text-white cursor-pointer">Home</li>
-            <li className="hover:text-gray-300 text-white cursor-pointer">Track</li>
-            <li className="hover:text-gray-300 text-white cursor-pointer">Contact</li>
-          </ul>
+        <nav className="flex items-center space-x-4">
+          <span className="hover:text-gray-300 text-white cursor-pointer flex items-center">
+            <DescriptionIcon style={{ color: 'white', marginRight: '4px' }} />
+            View Docs
+          </span>
+          <div className="relative">
+            <div className="w-10 h-10 bg-black cursor-pointer rounded-lg flex items-center justify-center">
+              <svg className="w-8 h-8 animate-rotate-circle">
+                <circle
+                  className="animate-outline-circle"
+                  cx="50%"
+                  cy="50%"
+                  r="45%"
+                  stroke="purple"
+                  strokeWidth="4"
+                  fill="none"
+                />
+              </svg>
+            </div>
+          </div>
+          <IconButton style={{ backgroundColor: 'black', borderRadius: '8px', padding: '8px' }}>
+            <SettingsIcon style={{ color: 'white' }} />
+          </IconButton>
+          <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600">
+            Connect
+          </button>
         </nav>
       </div>
     </div>

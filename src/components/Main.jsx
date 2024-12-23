@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from '../components/Header.jsx'
 import { Pie, Line } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement } from 'chart.js'
 import { IconButton } from '@mui/material'
 import { VisibilityOff, Visibility } from '@mui/icons-material'
+import moment from 'moment'
 
 ChartJS.register(ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement)
 
@@ -13,6 +14,31 @@ function Main() {
   const [walletAddress, setWalletAddress] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isTracking, setIsTracking] = useState(false)
+  const [assets, setAssets] = useState([
+    { name: 'solana', ticker: 'SOL', amount: 4, image: 'https://assets.coingecko.com/coins/images/4128/standard/solana.png?1718769756' },
+    { name: 'gigachad-2', ticker: 'GIGA', amount: 15364, image: 'https://assets.coingecko.com/coins/images/34755/standard/IMG_0015.png?1705957165' },
+    { name: 'lock-in', ticker: 'LOCKIN', amount: 2499, image: 'https://assets.coingecko.com/coins/images/38646/standard/lockin.png?1718212159' },
+    { name: 'magic-eden', ticker: 'ME', amount: 340, image: 'https://assets.coingecko.com/coins/images/39850/standard/_ME_Profile_Dark_2x.png?1734013082' },
+    { name: 'popcat', ticker: 'POPCAT', amount: 280, image: 'https://assets.coingecko.com/coins/images/33760/standard/image.jpg?1702964227' }
+  ])
+
+  useEffect(() => {
+    const fetchTokenData = async () => {
+      const ids = assets.map(asset => asset.name).join(',')
+      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`)
+      const data = await response.json()
+
+      const updatedAssets = assets.map(asset => ({
+        ...asset,
+        price: data[asset.name]?.usd || 0,
+        change: data[asset.name]?.usd_24h_change?.toFixed(2) || '0.00'
+      }))
+
+      setAssets(updatedAssets)
+    }
+
+    fetchTokenData()
+  }, [])
 
   const handleSubmit = () => {
     setIsSubmitted(true)
@@ -27,13 +53,11 @@ function Main() {
     setIsTracking(!isTracking)
   }
 
-  const assets = [
-    { name: 'SOL', amount: 4, price: 186.25, change: '0.98%' },
-    { name: 'GIGA', amount: 15364, price: 0.0509, change: '-0.19%' },
-    { name: 'LOCKIN', amount: 2499, price: 0.0271, change: '-2.62%' },
-    { name: 'ME', amount: 340, price: 3.10, change: '-0.09%' },
-    { name: 'POPCAT', amount: 280, price: 0.79, change: '7.87%' }
-  ]
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSubmit()
+    }
+  }
 
   const assetData = assets.map(asset => ({
     ...asset,
@@ -44,7 +68,7 @@ function Main() {
   const totalChange = assetData.reduce((acc, asset) => acc + parseFloat(asset.change), 0).toFixed(2)
 
   const pieData = {
-    labels: assetData.map(asset => asset.name),
+    labels: assetData.map(asset => asset.ticker),
     datasets: [
       {
         data: assetData.map(asset => asset.value),
@@ -101,6 +125,14 @@ function Main() {
     }
   }
 
+  const transactions = [
+    { date: moment().subtract(1, 'days').format('YYYY-MM-DD HH:mm:ss'), network: 'SOL', type: 'Sent' },
+    { date: moment().subtract(2, 'days').format('YYYY-MM-DD HH:mm:ss'), network: 'SOL', type: 'Received' },
+    { date: moment().subtract(3, 'days').format('YYYY-MM-DD HH:mm:ss'), network: 'SOL', type: 'Sent' },
+    { date: moment().subtract(4, 'days').format('YYYY-MM-DD HH:mm:ss'), network: 'SOL', type: 'Received' },
+    { date: moment().subtract(5, 'days').format('YYYY-MM-DD HH:mm:ss'), network: 'SOL', type: 'Sent' }
+  ]
+
   return (
     <div className="flex-grow flex items-center justify-center pt-16 pb-16">
       <div className="bg-black bg-opacity-80 p-8 flex flex-col items-center justify-center max-w-screen-xl w-full h-full text-center">
@@ -116,6 +148,7 @@ function Main() {
                 placeholder="Wallet Address" 
                 value={walletAddress}
                 onChange={(e) => setWalletAddress(e.target.value)}
+                onKeyPress={handleKeyPress}
               />
               <button 
                 className="p-2 bg-purple-600 text-white rounded-r-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
@@ -128,52 +161,91 @@ function Main() {
           </>
         ) : (
           <>
-            <div className="mt-8 w-full max-w-screen-lg flex justify-between items-center bg-black p-4 rounded-md">
-              <div className="text-left text-white">
-                <h2 className="text-2xl font-bold text-purple-600">Wallet Details:</h2>
-                <h1 className="text-2xl font-bold mt-4">Wallet Balance: ${totalBalance}</h1>
-                <p className="text-lg mt-2">24h Change: {totalChange}%</p>
-                <p className="text-lg mt-2 flex items-center">
-                  Wallet Address: {walletAddress}
+            <div className="mt-8 w-full max-w-screen-lg bg-black p-4 rounded-md">
+              <h2 className="text-2xl font-bold text-purple-600">Wallet Overview</h2>
+              <div className="mt-4 flex justify-between items-center">
+                <div className="text-left text-white w-1/2">
+                  <h2 className="text-2xl font-bold text-purple-600">Wallet Details:</h2>
+                  <h1 className="text-2xl font-bold mt-4">Wallet Balance: ${totalBalance}</h1>
+                  <p className="text-lg mt-2">24h Change: {totalChange}%</p>
+                  <p className="text-lg mt-2">Wallet Address: {walletAddress}</p>
+                  <p className="text-lg mt-2">Created: 117 days ago 4 hours</p>
                   <IconButton onClick={handleToggleTracking} color="inherit">
                     {isTracking ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
-                </p>
+                </div>
+                <div className="text-left text-white w-1/2">
+                  <h2 className="text-2xl font-bold text-purple-600">Recent Transactions:</h2>
+                  <table className="min-w-full bg-black mt-4">
+                    <thead>
+                      <tr>
+                        <th className="py-2 text-white">Date & Time</th>
+                        <th className="py-2 text-white">Network</th>
+                        <th className="py-2 text-white">Type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transactions.map((transaction, index) => (
+                        <tr key={index}>
+                          <td className="py-2 text-white text-center">{transaction.date}</td>
+                          <td className="py-2 text-white text-center">{transaction.network}</td>
+                          <td className="py-2 text-white text-center">{transaction.type}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <div className="w-1/2 flex flex-col items-center">
+            </div>
+            <div className="w-full max-w-screen-lg border-t border-gray-600 my-8"></div>
+
+            <div className="mt-4 max-w-screen-lg w-full bg-black p-4 rounded-md">
+              <h2 className="text-2xl font-bold text-purple-600 mt-8">Account Overview</h2>
+              <div className="mt-4 w-full h-96 flex justify-center items-center">
                 <Pie data={pieData} options={{ maintainAspectRatio: false }} width={200} height={200} />
               </div>
             </div>
-            <div className="w-full border-t border-gray-600 my-8"></div>
-            <h2 className="text-2xl font-bold text-purple-600 mt-8">Your 12 Month Recap...</h2>
-            <div className="mt-4 w-full h-96 bg-black max-w-screen-lg flex justify-center items-center">
-              <Line data={lineData} options={lineOptions} />
-            </div>
-            <h2 className="text-2xl font-bold text-purple-600 mt-8">Asset Breakdown</h2>
+            <div className="w-full max-w-screen-lg border-t border-gray-600 my-8"></div>
+
             <div className="mt-4 max-w-screen-lg w-full bg-black p-4 rounded-md">
-              <table className="min-w-full bg-black">
-                <thead>
-                  <tr>
-                    <th className="py-2 text-white">Asset</th>
-                    <th className="py-2 text-white">Amount</th>
-                    <th className="py-2 text-white">Price Change (%)</th>
-                    <th className="py-2 text-white">Price (USD)</th>
-                    <th className="py-2 text-white">Value (USD)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {assetData.map((asset, index) => (
-                    <tr key={index}>
-                      <td className="py-2 text-white">{asset.name}</td>
-                      <td className="py-2 text-white">{asset.amount}</td>
-                      <td className="py-2 text-white">{asset.change}</td>
-                      <td className="py-2 text-white">${asset.price.toFixed(2)}</td>
-                      <td className="py-2 text-white">${asset.value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <h2 className="text-2xl font-bold text-purple-600 mt-8">Your 12 Month Recap...</h2>
+              <div className="mt-4 w-full h-96 flex justify-center items-center">
+                <Line data={lineData} options={lineOptions} />
+              </div>
             </div>
+            <div className="w-full max-w-screen-lg border-t border-gray-600 my-8"></div>
+
+            <div className="mt-4 max-w-screen-lg w-full bg-black p-4 rounded-md">
+              <h2 className="text-2xl font-bold text-purple-600 mt-8">Asset Breakdown</h2>
+              <div className="mt-4">
+                <table className="min-w-full bg-black">
+                  <thead>
+                    <tr>
+                      <th className="py-2 text-white">Asset</th>
+                      <th className="py-2 text-white">Amount</th>
+                      <th className="py-2 text-white">Price Change (%)</th>
+                      <th className="py-2 text-white">Price (USD)</th>
+                      <th className="py-2 text-white">Value (USD)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {assetData.map((asset, index) => (
+                      <tr key={index}>
+                        <td className="py-2 text-white text-center flex items-center justify-center">
+                          <img src={asset.image} alt={asset.name} className="w-6 h-6 rounded-full mr-2" />
+                          {asset.ticker}
+                        </td>
+                        <td className="py-2 text-white text-center">{asset.amount}</td>
+                        <td className="py-2 text-white text-center">{asset.change}%</td>
+                        <td className="py-2 text-white text-center">${asset.price.toFixed(2)}</td>
+                        <td className="py-2 text-white text-center">${asset.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <button 
               className="mt-8 p-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
               onClick={handleBack}
