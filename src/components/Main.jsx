@@ -14,6 +14,7 @@ function Main() {
   const [walletAddress, setWalletAddress] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isTracking, setIsTracking] = useState(false)
+  const [showFullAddress, setShowFullAddress] = useState(false)
   const [assets, setAssets] = useState([
     { name: 'solana', ticker: 'SOL', amount: 4, image: 'https://assets.coingecko.com/coins/images/4128/standard/solana.png?1718769756' },
     { name: 'gigachad-2', ticker: 'GIGA', amount: 15364, image: 'https://assets.coingecko.com/coins/images/34755/standard/IMG_0015.png?1705957165' },
@@ -57,6 +58,10 @@ function Main() {
     if (event.key === 'Enter') {
       handleSubmit()
     }
+  }
+
+  const handleToggleAddress = () => {
+    setShowFullAddress(!showFullAddress)
   }
 
   const assetData = assets.map(asset => ({
@@ -135,7 +140,7 @@ function Main() {
 
   return (
     <div className="flex-grow flex items-center justify-center pt-16 pb-16">
-      <div className="bg-black bg-opacity-80 p-8 flex flex-col items-center justify-center max-w-screen-xl w-full h-full text-center">
+      <div className="bg-gray-950 p-8 flex flex-col items-center justify-center max-w-screen-xl w-full h-full text-center">
         <Header />
         {!isSubmitted ? (
           <>
@@ -157,7 +162,7 @@ function Main() {
                 Check
               </button>
             </div>
-            <p className="mt-32 text-gray-600">Coded for educational purposes to learn NextJS, Rust, Anchor & Styled with TailwindCSS</p>
+            <p className="mt-32 text-gray-600">Coded for educational purposes to train my NextJS, Rust, Anchor & TailwindCSS skills</p>
           </>
         ) : (
           <>
@@ -165,35 +170,53 @@ function Main() {
               <h2 className="text-2xl font-bold text-purple-600">Wallet Overview</h2>
               <div className="mt-4 flex justify-between items-center">
                 <div className="text-left text-white w-1/2">
-                  <h2 className="text-2xl font-bold text-purple-600">Wallet Details:</h2>
-                  <h1 className="text-2xl font-bold mt-4">Wallet Balance: ${totalBalance}</h1>
+                  <h1 className="text-lg mt-4">Wallet Balance: ${totalBalance}</h1>
                   <p className="text-lg mt-2">24h Change: {totalChange}%</p>
-                  <p className="text-lg mt-2">Wallet Address: {walletAddress}</p>
+                  <p className="text-lg mt-2 flex items-center">
+                    Wallet Address: {showFullAddress ? walletAddress : `${walletAddress.slice(0, 8)}...`}
+                    <IconButton onClick={handleToggleAddress} color="inherit">
+                      {showFullAddress ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </p>
                   <p className="text-lg mt-2">Created: 117 days ago 4 hours</p>
-                  <IconButton onClick={handleToggleTracking} color="inherit">
-                    {isTracking ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
                 </div>
                 <div className="text-left text-white w-1/2">
                   <h2 className="text-2xl font-bold text-purple-600">Recent Transactions:</h2>
-                  <table className="min-w-full bg-black mt-4">
-                    <thead>
-                      <tr>
-                        <th className="py-2 text-white">Date & Time</th>
-                        <th className="py-2 text-white">Network</th>
-                        <th className="py-2 text-white">Type</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transactions.map((transaction, index) => (
-                        <tr key={index}>
-                          <td className="py-2 text-white text-center">{transaction.date}</td>
-                          <td className="py-2 text-white text-center">{transaction.network}</td>
-                          <td className="py-2 text-white text-center">{transaction.type}</td>
+                  <div className="bg-gray-800 p-4 rounded-md">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr>
+                          <th className="py-2 text-white text-center">Date & Time</th>
+                          <th className="py-2 text-white text-center">Network</th>
+                          <th className="py-2 text-white text-center">Type</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {transactions.map((transaction, index) => (
+                          <tr key={index} className="border-b border-gray-600">
+                            <td className="py-2 text-white text-center">{transaction.date}</td>
+                            <td className="py-2 text-white text-center">{transaction.network}</td>
+                            <td className="py-2 text-white text-center">{transaction.type}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div className="flex justify-between items-center mt-4">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-white">1/53</span>
+                        <div className="border-l border-gray-600 h-6 mx-2"></div>
+                        <button className="text-white font-bold">
+                          Prev
+                        </button>
+                        <button className="text-white font-bold">
+                          Next
+                        </button>
+                      </div>
+                      <button className="text-white font-bold ml-auto">
+                        View All
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
