@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -10,13 +10,52 @@ import {
   PointElement
 } from 'chart.js';
 import moment from 'moment';
-import { INITIAL_ASSETS } from '../types/assetData';
 import WalletInput from './WalletInput';
 import WalletOverview from './WalletOverview';
 import AccountSummary from './AccountSummary';
 import PortfolioRecap from './PortfolioRecap';
 import AssetBreakdown from './AssetBreakdown';
 import Coins from './Coins';
+import TransactionHistory from './TransactionHistory';
+import SolanaStats from './SolanaStats';
+export const INITIAL_ASSETS: Asset[] = [
+  { 
+    name: 'Solana', 
+    ticker: 'SOL',
+    amount: 4,
+    image: 'https://assets.coingecko.com/coins/images/4128/small/solana.png',
+    price: 198.45,
+    change: '8.32',
+    value: '793.80'
+  },
+  { 
+    name: 'BONK', 
+    ticker: 'BONK',
+    amount: 15364000,
+    image: 'https://assets.coingecko.com/coins/images/28600/small/bonk.jpg',
+    price: 0.00001635,
+    change: '31.2',
+    value: '251.20'
+  },
+  { 
+    name: 'Jito', 
+    ticker: 'JITO',
+    amount: 25.5,
+    image: 'https://assets.coingecko.com/coins/images/33103/small/jito.png',
+    price: 3.92,
+    change: '21.3',
+    value: '99.96'
+  },
+  { 
+    name: 'Jupiter', 
+    ticker: 'JUP',
+    amount: 340,
+    image: 'https://assets.coingecko.com/coins/images/34169/small/jup.png',
+    price: 1.24,
+    change: '15.4',
+    value: '421.60'
+  }
+];
 
 ChartJS.register(
   ArcElement,
@@ -33,21 +72,20 @@ interface MainProps {
   setIsSubmitted: (value: boolean) => void;
 }
 
-interface Asset {
+export interface Asset {
   name: string;
   ticker: string;
-  price: number;
   amount: number;
+  image: string;
+  price: number;
   change: string;
   value: string;
-  image: string;
 }
 
 const Main: React.FC<MainProps> = ({ isSubmitted, setIsSubmitted }) => {
   const [walletAddress, setWalletAddress] = useState('');
-  const [isTracking, setIsTracking] = useState(false);
   const [showFullAddress, setShowFullAddress] = useState(false);
-  const [assets, setAssets] = useState<Asset[]>(INITIAL_ASSETS);
+  const [assets] = useState(INITIAL_ASSETS);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -64,8 +102,13 @@ const Main: React.FC<MainProps> = ({ isSubmitted, setIsSubmitted }) => {
     value: (asset.amount * asset.price).toFixed(2)
   }));
 
-  const totalBalance = assetData.reduce((acc, asset) => acc + parseFloat(asset.value), 0).toFixed(2);
-  const totalChange = assetData.reduce((acc, asset) => acc + parseFloat(asset.change), 0).toFixed(2);
+  const totalBalance = assetData
+    .reduce((acc, asset) => acc + parseFloat(asset.value), 0)
+    .toFixed(2);
+    
+  const totalChange = assetData
+    .reduce((acc, asset) => acc + parseFloat(asset.change), 0)
+    .toFixed(2);
 
   const transactions = [
     { date: moment().subtract(1, 'days').format('YYYY-MM-DD HH:mm:ss'), network: 'SOL', type: 'Sent' },
@@ -81,51 +124,69 @@ const Main: React.FC<MainProps> = ({ isSubmitted, setIsSubmitted }) => {
   };
 
   return (
-    <div className="flex-grow flex items-center justify-center pt-16 pb-16 bg-gradient-radial from-purple-50/[0.05] via-purple-900/[0.02] to-gray-950">
-      <div className="bg-transparent p-8 flex flex-col items-center justify-center max-w-screen-xl w-full h-full text-center">
-        {!isSubmitted ? (
-          <>
-            <WalletInput
-              walletAddress={walletAddress}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletAddress(e.target.value)}
-              onSubmit={() => setIsSubmitted(true)}
-              onKeyDown={handleKeyPress}
-            />
-            <Coins />
-          </>
-        ) : (
-          <>
-            <WalletOverview 
-              totalBalance={totalBalance}
-              totalChange={totalChange}
-              walletAddress={walletAddress}
-              showFullAddress={showFullAddress}
-              handleToggleAddress={handleToggleAddress}
-              transactions={transactions}
-            />
+    <div className="min-h-screen bg-gradient-radial from-purple-50/[0.05] via-purple-900/[0.02] to-gray-950">
+  <div className="container mx-auto px-4 py-16">
+    {!isSubmitted ? (
+      <>
+        <WalletInput
+          walletAddress={walletAddress}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletAddress(e.target.value)}
+          onSubmit={() => setIsSubmitted(true)}
+          onKeyDown={handleKeyPress}
+        />
+        <div className="text-center">
+          <SolanaStats />
+          <Coins />
+        </div>
+      </>
+    ) : (
+      <div className="space-y-8">
+        <div className="text-center">
+          <WalletOverview
+            totalBalance={totalBalance}
+            totalChange={totalChange}
+            walletAddress={walletAddress}
+            showFullAddress={showFullAddress}
+            handleToggleAddress={handleToggleAddress}
+          />
+        </div>
 
-            <div className="w-full max-w-screen-lg border-t border-gray-600 my-8"></div>
+        <div className="border-t border-gray-800 my-8"></div>
 
-            <AccountSummary assetData={assetData} />
+        <div className="text-center">
+          <TransactionHistory transactions={transactions} />
+        </div>
 
-            <div className="w-full max-w-screen-lg border-t border-gray-600 my-8"></div>
+        <div className="border-t border-gray-800 my-8"></div>
 
-            <PortfolioRecap />
+        <div className="text-center">
+          <AccountSummary assetData={assetData} />
+        </div>
 
-            <div className="w-full max-w-screen-lg border-t border-gray-600 my-8"></div>
+        <div className="border-t border-gray-800 my-8"></div>
 
-            <AssetBreakdown assetData={assetData} />
+        <div className="text-center">
+          <PortfolioRecap />
+        </div>
 
-            <button 
-              className="mt-8 p-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
-              onClick={handleBackAndScroll}
-            >
-              Back
-            </button>
-          </>
-        )}
+        <div className="border-t border-gray-800 my-8"></div>
+
+        <div className="text-center">
+          <AssetBreakdown assetData={assetData} />
+        </div>
+
+        <div className="flex justify-center">
+          <button 
+            className="mt-8 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 transition-colors duration-200"
+            onClick={handleBackAndScroll}
+          >
+            Back to Search
+          </button>
+        </div>
       </div>
-    </div>
+    )}
+  </div>
+</div>
   );
 };
 
