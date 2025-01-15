@@ -18,6 +18,7 @@ import AssetBreakdown from './AssetBreakdown';
 import Coins from './Coins';
 import TransactionHistory from './TransactionHistory';
 import SolanaStats from './SolanaStats';
+import GetMoreInfo from './GetMoreInfo';
 export const INITIAL_ASSETS: Asset[] = [
   { 
     name: 'Solana', 
@@ -137,6 +138,7 @@ const Main: React.FC<MainProps> = ({ isSubmitted, setIsSubmitted }) => {
         <div className="text-center">
           <SolanaStats />
           <Coins />
+          <GetMoreInfo />
         </div>
       </>
     ) : (
