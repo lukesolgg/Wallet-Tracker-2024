@@ -1,16 +1,22 @@
 import React from 'react';
+import { FaChartLine } from 'react-icons/fa';
 
 const GetMoreInfo: React.FC = () => {
   return (
-    <section className="bg-gradient-to-br from-blue-500 to-purple-500 text-white p-8 rounded-lg shadow-lg max-w-lg mx-auto">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold mb-4">Unlock Insights</h2>
-        <p className="text-lg mb-6">Connect your wallet for personalized portfolio analysis</p>
-        <button 
-          className="bg-white text-black font-bold py-2 px-4 rounded-full hover:bg-gray-200 transition duration-300 ease-in-out"
-        >
-          Connect Wallet
-        </button>
+    <section className=" text-white p-8 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row items-center justify-between">
+        <div className="flex items-center justify-center w-full md:w-1/2 mb-8 md:mb-0">
+          <FaChartLine className="text-[30rem] text-blue-500" />
+        </div>
+        <div className="w-full md:w-1/2 text-center md:text-left">
+          <h2 className="text-5xl font-bold mb-4">Unlock Insights</h2>
+          <p className="text-2xl mb-6">Connect your wallet for personalized portfolio analysis</p>
+          <button 
+            className="bg-blue-500 text-white font-bold py-3 px-6 rounded-full hover:bg-blue-600 transition duration-300 ease-in-out"
+          >
+            Connect Wallet
+          </button>
+        </div>
       </div>
     </section>
   );
